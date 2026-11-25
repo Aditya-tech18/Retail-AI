@@ -1,0 +1,1895 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+<title>RetailAI 3.0 — Intelligence Dashboard</title>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<style>
+:root{
+ --pink:#f50080;
+ --hot:#ff168e;
+ --deep:#bc0064;
+ --ink:#17151b;
+ --muted:#74717d;
+ --line:#e9e5ec;
+ --paper:#fff;
+ --soft:#f8f7fa;
+ --shadow:0 7px 20px rgba(35,19,36,.08);
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:#f2f0f4;
+ color:var(--ink);
+ font-family:Inter,-apple-system,BlinkMacSystemFont,
+ "Segoe UI",Arial,sans-serif;
+ -webkit-font-smoothing:antialiased;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.shell{
+ width:min(1440px,100%);
+ margin:0 auto;
+ min-height:100vh;
+ background:#fff;
+ box-shadow:0 0 40px #24152714;
+}
+nav{
+ height:68px;
+ background:linear-gradient(120deg,#151218,#24202a);
+ color:#fff;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:0 31px;
+ gap:20px;
+}
+.brand{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ font-weight:850;
+ font-size:25px;
+ letter-spacing:-1.1px;
+ white-space:nowrap;
+}
+.brand b{color:var(--hot)}
+.diamond{
+ color:var(--pink);
+ font-size:25px;
+}
+.tabs{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+}
+.tab{
+ color:#f6f4f7;
+ background:transparent;
+ border:0;
+ border-radius:18px;
+ padding:11px 18px;
+ font-size:13px;
+ font-weight:650;
+ white-space:nowrap;
+}
+.tab:hover{background:#ffffff17}
+.tab.active{
+ background:linear-gradient(135deg,#ff319b,#e60075);
+ box-shadow:0 3px 12px #f5008060;
+}
+.nav-icons{
+ display:flex;
+ align-items:center;
+ gap:14px;
+ font-size:19px;
+}
+.avatar{
+ width:28px;
+ height:28px;
+ border-radius:50%;
+ background:var(--pink);
+ display:grid;
+ place-items:center;
+ font-size:15px;
+}
+.screen{
+ display:none;
+ padding:0 24px 24px;
+ animation:appear .25s ease;
+}
+.screen.active{display:block}
+@keyframes appear{
+ from{opacity:.7;transform:translateY(5px)}
+ to{opacity:1;transform:none}
+}
+.hero{
+ height:182px;
+ background:
+ radial-gradient(circle at 83% 30%,#ffc6e7a6,transparent 35%),
+ linear-gradient(110deg,#fff 25%,#fff0f8 75%,#ffe1f2);
+ border-radius:0 0 18px 18px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:24px 34px;
+ overflow:hidden;
+}
+.eyebrow{
+ font-size:12px;
+ color:var(--pink);
+ font-weight:850;
+ letter-spacing:.4px;
+ text-transform:uppercase;
+ margin-bottom:10px;
+}
+h1{
+ font-size:clamp(27px,3vw,39px);
+ line-height:1.06;
+ letter-spacing:-1.5px;
+ margin:0 0 11px;
+ font-weight:850;
+}
+h1 em{
+ color:var(--pink);
+ font-style:normal;
+}
+.subtitle{
+ color:#55515d;
+ font-size:14px;
+ margin:0;
+ line-height:1.55;
+}
+.hero-art{
+ flex:0 0 235px;
+ height:155px;
+ position:relative;
+ display:grid;
+ place-items:center;
+}
+.hero-art .symbol{
+ font-size:100px;
+ filter:drop-shadow(0 12px 12px #f5008033);
+ transform:rotate(-6deg);
+}
+.hero-art .glow{
+ position:absolute;
+ bottom:4px;
+ width:180px;
+ height:26px;
+ border-radius:50%;
+ background:#ffb4db;
+ filter:blur(18px);
+}
+.hero-art .symbol{z-index:1}
+.metrics{
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:14px;
+ margin:17px 0;
+}
+.card{
+ background:linear-gradient(160deg,#fff,#fcfbfd);
+ border:1px solid var(--line);
+ border-radius:17px;
+ box-shadow:var(--shadow);
+ padding:18px;
+ min-width:0;
+}
+.metric{
+ min-height:116px;
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ position:relative;
+}
+.metric.primary{
+ background:linear-gradient(145deg,#ff2999,#d6006b);
+ color:#fff;
+ border-color:#e60075;
+ box-shadow:0 7px 16px #e0007540;
+}
+.metric-icon{
+ color:var(--pink);
+ font-size:25px;
+ line-height:1;
+ margin-bottom:7px;
+}
+.metric.primary .metric-icon{color:white}
+.kicker{
+ font-size:12px;
+ font-weight:700;
+ margin-bottom:7px;
+}
+.value{
+ font-size:clamp(22px,2.5vw,34px);
+ font-weight:850;
+ letter-spacing:-1.2px;
+ white-space:nowrap;
+}
+.note{
+ margin-top:5px;
+ font-size:11px;
+ color:#6f6b74;
+}
+.primary .note{color:#fff9}
+.panel-grid{
+ display:grid;
+ grid-template-columns:1.3fr 1fr;
+ gap:15px;
+ margin:15px 0;
+}
+.panel-grid.equal{grid-template-columns:1fr 1fr}
+.panel-grid.thirds{grid-template-columns:1.15fr .85fr}
+.card h2{
+ margin:0 0 8px;
+ font-size:19px;
+ letter-spacing:-.55px;
+ font-weight:850;
+}
+.desc{
+ color:var(--muted);
+ font-size:12px;
+ margin:0 0 8px;
+}
+.plot{height:250px;width:100%}
+.plot.short{height:210px}
+.plot.tall{height:290px}
+.category-row{
+ display:grid;
+ grid-template-columns:minmax(90px,1fr) 2fr 92px;
+ align-items:center;
+ gap:9px;
+ margin:15px 0;
+ font-size:12px;
+}
+.category-row strong{
+ text-align:right;
+ white-space:nowrap;
+}
+.bar-bg{
+ background:#eae8ed;
+ border-radius:8px;
+ height:11px;
+ overflow:hidden;
+}
+.bar{
+ height:100%;
+ border-radius:8px;
+ background:linear-gradient(90deg,#ff56ae,#e90078);
+}
+.insight{
+ background:linear-gradient(120deg,#29222e,#17141c);
+ color:white;
+ border-radius:16px;
+ display:flex;
+ align-items:center;
+ gap:16px;
+ padding:18px 22px;
+ margin-top:16px;
+ box-shadow:var(--shadow);
+}
+.insight-icon{font-size:37px;color:#ffa1d2}
+.insight-copy{flex:1}
+.insight-copy h2{font-size:20px;margin:0 0 5px}
+.insight-copy p{margin:0;font-size:13px;color:#e4dce6}
+.pink-button{
+ background:linear-gradient(140deg,#ff359d,#df0072);
+ color:#fff;
+ border:0;
+ border-radius:11px;
+ padding:13px 17px;
+ font-size:12px;
+ font-weight:800;
+ box-shadow:0 4px 12px #d6006b45;
+}
+.pink-button:hover{filter:brightness(1.06)}
+.segment-row{
+ display:flex;
+ justify-content:space-between;
+ gap:8px;
+ margin:10px 0;
+ font-size:12px;
+}
+.dot{
+ display:inline-block;
+ width:11px;
+ height:11px;
+ border-radius:3px;
+ margin-right:7px;
+}
+.two-col{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:12px;
+}
+.stat-grid{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:12px;
+ margin:14px 0;
+}
+.stat{
+ text-align:center;
+ padding:13px 7px;
+ background:#fff;
+ border:1px solid var(--line);
+ border-radius:13px;
+ box-shadow:var(--shadow);
+}
+.stat small{
+ display:block;
+ font-size:11px;
+ font-weight:700;
+ margin-bottom:6px;
+}
+.stat strong{
+ font-size:22px;
+ font-weight:850;
+}
+.confusion{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px;
+}
+.confusion .cell{
+ border:1px solid var(--line);
+ border-radius:12px;
+ padding:14px;
+ background:#f8f7f9;
+}
+.confusion .cell:first-child{background:#ffe2f1}
+.confusion .cell strong{
+ display:block;
+ font-size:25px;
+}
+.confusion .cell span{font-size:11px}
+.range-row{margin:18px 0}
+.range-label{
+ display:flex;
+ justify-content:space-between;
+ font-size:12px;
+ font-weight:750;
+ margin-bottom:8px;
+}
+input[type=range]{
+ width:100%;
+ accent-color:var(--pink);
+ cursor:pointer;
+}
+.impact{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:9px;
+}
+.impact .cell{
+ border-radius:12px;
+ border:1px solid var(--line);
+ background:#f9f8fa;
+ padding:12px;
+}
+.impact .cell.highlight{background:#ffe1f0}
+.impact .cell small{
+ display:block;
+ font-size:11px;
+ color:#625d69;
+}
+.impact .cell strong{
+ display:block;
+ font-size:22px;
+ margin-top:5px;
+}
+.impact .cell.highlight strong{color:var(--deep)}
+.ab-box{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin:13px 0;
+}
+.ab-box div{
+ padding:17px;
+ border-radius:12px;
+ background:#f3f2f5;
+}
+.ab-box div:last-child{background:#ffe5f2}
+.ab-box b{display:block;font-size:20px}
+.ab-box small{font-size:11px}
+.chat-form{display:flex;gap:7px;margin:12px 0}
+.chat-form input{
+ flex:1;
+ min-width:0;
+ border:1px solid var(--line);
+ padding:12px;
+ border-radius:11px;
+ outline:none;
+}
+.chat-output{
+ background:#fff0f8;
+ padding:12px;
+ border-radius:12px;
+ font-size:12px;
+ line-height:1.5;
+ min-height:58px;
+}
+.chips{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ margin-top:10px;
+}
+.chip{
+ border:1px solid #efd5e5;
+ background:#fff8fc;
+ border-radius:16px;
+ padding:8px 11px;
+ font-size:11px;
+}
+.review-search{
+ width:100%;
+ border:1px solid var(--line);
+ border-radius:12px;
+ padding:13px;
+ outline:none;
+ margin:10px 0;
+}
+.review-row{
+ display:grid;
+ grid-template-columns:80px 1fr 85px;
+ gap:10px;
+ padding:12px 5px;
+ border-bottom:1px solid var(--line);
+ font-size:12px;
+ align-items:center;
+}
+.review-row .stars{color:var(--pink)}
+.review-row .sent{font-weight:750;color:var(--deep)}
+.status{
+ padding:10px 14px;
+ background:#fff4f9;
+ color:#a00056;
+ border-radius:10px;
+ font-size:12px;
+ margin:12px 0;
+ display:none;
+}
+.status.visible{display:block}
+.footer{
+ padding:18px 25px 25px;
+ color:#9a95a0;
+ font-size:11px;
+ text-align:center;
+}
+@media(max-width:1050px){
+ nav{padding:0 14px}
+ .brand{font-size:19px}
+ .tab{padding:9px 10px;font-size:11px}
+ .metrics{gap:8px}
+ .card{padding:13px}
+ .hero{padding:18px}
+}
+@media(max-width:740px){
+ nav{height:auto;flex-wrap:wrap;padding:12px}
+ .tabs{order:3;width:100%;overflow-x:auto;justify-content:flex-start}
+ .screen{padding:0 12px 15px}
+ .hero{height:auto;min-height:165px}
+ .hero-art{flex-basis:90px}
+ .hero-art .symbol{font-size:60px}
+ .metrics{grid-template-columns:1fr 1fr}
+ .panel-grid,.panel-grid.equal,.panel-grid.thirds{
+  grid-template-columns:1fr
+ }
+ .stat-grid{grid-template-columns:1fr 1fr}
+ .insight{flex-wrap:wrap}
+ .review-row{grid-template-columns:65px 1fr}
+ .review-row .sent{grid-column:2}
+}
+
+/* RETAILAI REVIEWS V2 — PREMIUM REBUILD */
+
+#reviews .hero {
+    min-height: 180px;
+    background:
+      radial-gradient(ellipse at 88% 50%,
+      rgba(255, 97, 177, .28), transparent 35%),
+      linear-gradient(110deg,#fff 18%,#fff4fa 70%,#ffe2f1);
+}
+
+#reviews .hero-art .symbol {
+    font-size: 105px;
+}
+
+#reviews .metrics {
+    gap: 16px;
+}
+
+#reviews .metric {
+    min-height: 122px;
+    border-radius: 18px;
+}
+
+#reviews .panel-grid {
+    gap: 17px;
+    margin: 17px 0;
+}
+
+#reviews .card {
+    border-radius: 19px;
+    padding: 20px;
+    background: #fff;
+}
+
+#reviews .card h2 {
+    font-size: 19px;
+    letter-spacing: -.6px;
+}
+
+#reviews .plot {
+    height: 255px;
+    min-height: 255px;
+    overflow: hidden;
+}
+
+#reviews .review-donut-layout {
+    display: grid;
+    grid-template-columns: 1fr .85fr;
+    align-items: center;
+    height: 100%;
+    gap: 15px;
+}
+
+#reviews .review-legend-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+    padding: 12px 2px;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+#reviews .review-legend-row strong {
+    font-size: 15px;
+}
+
+#reviews .review-legend-row i {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+#reviews svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+#reviews .review-row {
+    grid-template-columns: 80px minmax(0,1fr) 85px;
+    line-height: 1.5;
+}
+
+#reviews .review-row span:nth-child(2) {
+    overflow-wrap: anywhere;
+}
+
+#reviews .insight {
+    min-height: 220px;
+}
+
+#reviews .review-subtitle {
+    font-size: 11px;
+    color: #8b8490;
+    margin-top: 8px;
+}
+
+@media(max-width:740px){
+  #reviews .review-donut-layout {
+      grid-template-columns: 1fr;
+  }
+  #reviews .plot {
+      height: 310px;
+  }
+}
+
+</style>
+
+<style>
+#reviews .metrics .metric:first-child,
+#reviews .metrics .metric.primary {
+ background:linear-gradient(
+  145deg,#ff2999,#d6006b
+ ) !important;
+ color:white !important;
+ border:1px solid #ed0b85 !important;
+ box-shadow:0 8px 18px rgba(220,0,110,.23) !important;
+}
+#reviews .metrics .metric:first-child * {
+ color:white !important;
+}
+#reviews .metrics .metric:first-child .value {
+ font-size:35px !important;
+ font-weight:850 !important;
+}
+#reviews #reviewResults {
+ max-height:360px;
+ overflow-y:auto;
+ scrollbar-width:thin;
+}
+#reviews .review-row {
+ padding:12px 5px;
+}
+#reviews .panel-grid .card {
+ min-height:280px;
+}
+#reviews .review-donut-layout {
+ min-height:225px;
+}
+#reviews .plot {
+ min-height:240px;
+}
+#reviews .insight {
+ min-height:260px;
+}
+</style>
+
+
+<style>
+#reviews .metrics .metric:first-child,
+#reviews .metrics .metric.primary {
+ background:linear-gradient(
+  145deg,#ff2999,#d6006b
+ ) !important;
+ color:white !important;
+ border:1px solid #ed0b85 !important;
+ box-shadow:0 8px 18px rgba(220,0,110,.23) !important;
+}
+#reviews .metrics .metric:first-child * {
+ color:white !important;
+}
+#reviews .metrics .metric:first-child .value {
+ font-size:35px !important;
+ font-weight:850 !important;
+}
+#reviews #reviewResults {
+ max-height:360px;
+ overflow-y:auto;
+ scrollbar-width:thin;
+}
+#reviews .review-row {
+ padding:12px 5px;
+}
+#reviews .panel-grid .card {
+ min-height:280px;
+}
+#reviews .review-donut-layout {
+ min-height:225px;
+}
+#reviews .plot {
+ min-height:240px;
+}
+#reviews .insight {
+ min-height:260px;
+}
+</style>
+
+</head>
+<body>
+<div class="shell">
+
+<nav>
+ <div class="brand">
+  <span class="diamond">◆</span>
+  <span>RetailAI <b>3.0</b></span>
+ </div>
+ <div class="tabs">
+  <button class="tab active" data-page="overview">Overview</button>
+  <button class="tab" data-page="customers">Customers</button>
+  <button class="tab" data-page="predictions">AI Predictions</button>
+  <button class="tab" data-page="decisions">Business Decisions</button>
+  <button class="tab" data-page="reviews">Reviews</button>
+ </div>
+ <div class="nav-icons"><span>♧</span><span class="avatar">●</span></div>
+</nav>
+
+<div id="status" class="status"></div>
+
+<section class="screen active" id="overview">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">Marketplace Performance</div>
+   <h1>Understand Your<br><em>Business Performance.</em></h1>
+   <p class="subtitle">
+    Track sales, orders and delivery performance across the marketplace.
+   </p>
+  </div>
+  <div class="hero-art">
+   <div class="glow"></div>
+   <div class="symbol">🛒</div>
+  </div>
+ </div>
+ <div class="metrics">
+  <div class="card metric primary">
+   <div class="metric-icon">▤</div>
+   <div class="kicker">Total Revenue</div>
+   <div class="value" id="oRevenue">—</div>
+   <div class="note">Historical payment revenue</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">⬡</div>
+   <div class="kicker">Total Orders</div>
+   <div class="value" id="oOrders">—</div>
+   <div class="note">Unique orders</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">◇</div>
+   <div class="kicker">Avg. Order Value</div>
+   <div class="value" id="oAov">—</div>
+   <div class="note">Revenue ÷ orders</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">♧</div>
+   <div class="kicker">Late Delivery Rate</div>
+   <div class="value" id="oLate">—</div>
+   <div class="note">Delivered orders with known dates</div>
+  </div>
+ </div>
+ <div class="panel-grid">
+  <div class="card">
+   <h2>Monthly Sales Trend</h2>
+   <p class="desc">Historical payment revenue by purchase month</p>
+   <div id="salesChart" class="plot tall"></div>
+  </div>
+  <div class="card">
+   <h2>Top Categories (Revenue)</h2>
+   <p class="desc">Product item sales, excluding freight</p>
+   <div id="categoryRows"></div>
+  </div>
+ </div>
+ <div class="insight">
+  <div class="insight-icon">◎</div>
+  <div class="insight-copy">
+   <h2>Key Insight</h2>
+   <p id="overviewInsight">Analyzing sales and delivery performance.</p>
+  </div>
+  <button class="pink-button" data-go="customers">
+   Explore Customers →
+  </button>
+ </div>
+</section>
+
+<section class="screen" id="customers">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">Customer Intelligence</div>
+   <h1>Understand Your<br><em>Customers Better.</em></h1>
+   <p class="subtitle">
+    See who spends more, who returns and what they think.
+   </p>
+  </div>
+  <div class="hero-art">
+   <div class="glow"></div>
+   <div class="symbol">👥</div>
+  </div>
+ </div>
+ <div class="metrics">
+  <div class="card metric primary">
+   <div class="metric-icon">♙</div>
+   <div class="kicker">Unique Customers</div>
+   <div class="value" id="cUnique">—</div>
+   <div class="note">Unique customer identities</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">⟳</div>
+   <div class="kicker">Repeat Purchase</div>
+   <div class="value" id="cRepeat">—</div>
+   <div class="note">Customers with 2+ orders</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">☆</div>
+   <div class="kicker">Avg. Review</div>
+   <div class="value" id="cRating">—</div>
+   <div class="note">Out of five stars</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">♧</div>
+   <div class="kicker">Customer Groups</div>
+   <div class="value" id="cGroups">—</div>
+   <div class="note">Rule-based RFM segments</div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Customer Segments (RFM)</h2>
+   <p class="desc">Recency, frequency and monetary value</p>
+   <div id="segmentsChart" class="plot"></div>
+  </div>
+  <div class="card">
+   <h2>Customer Segment Breakdown</h2>
+   <p class="desc">Actual segment sizes</p>
+   <div id="segmentRows"></div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Review Rating Distribution</h2>
+   <div id="customerRatings" class="plot short"></div>
+  </div>
+  <div class="card">
+   <h2>Customer Retention</h2>
+   <p class="desc">
+    Repeat-purchase behavior, not simulated retention
+   </p>
+   <div id="retentionInfo"></div>
+   <button class="pink-button" data-go="reviews">
+    Explore Reviews →
+   </button>
+  </div>
+ </div>
+</section>
+
+<section class="screen" id="predictions">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">Champion Model Audit</div>
+   <h1>Predict Late Deliveries<br>
+    with <em>Measured Performance.</em>
+   </h1>
+   <p class="subtitle">
+    Rank risky orders and evaluate historical model results.
+   </p>
+  </div>
+  <div class="hero-art">
+   <div class="glow"></div>
+   <div class="symbol">▱</div>
+  </div>
+ </div>
+ <div class="metrics">
+  <div class="card metric primary">
+   <div class="metric-icon">◎</div>
+   <div class="kicker">Recall at 20% Capacity</div>
+   <div class="value" id="pRecall">—</div>
+   <div class="note">Late orders identified in top-risk 20%</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">▤</div>
+   <div class="kicker">Evaluated Orders</div>
+   <div class="value" id="pEvaluated">—</div>
+   <div class="note">Held-out test cohort</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">♧</div>
+   <div class="kicker">Actual Late Orders</div>
+   <div class="value" id="pLate">—</div>
+   <div class="note">Observed late deliveries</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">⚠</div>
+   <div class="kicker">Orders Flagged</div>
+   <div class="value" id="pFlagged">—</div>
+   <div class="note">Highest-risk orders reviewed</div>
+  </div>
+ </div>
+ <div class="stat-grid">
+  <div class="stat"><small>Recall @20%</small><strong id="pR2">—</strong></div>
+  <div class="stat"><small>Precision @20%</small><strong id="pPrecision">—</strong></div>
+  <div class="stat"><small>Lift @20%</small><strong id="pLift">—</strong></div>
+  <div class="stat"><small>ROC-AUC</small><strong id="pAuc">—</strong></div>
+ </div>
+ <div class="panel-grid">
+  <div class="card">
+   <h2>Intervention Capacity</h2>
+   <p class="desc">Recall vs. review budget</p>
+   <div id="capacityChart" class="plot tall"></div>
+  </div>
+  <div class="card">
+   <h2>Confusion Matrix (Top 20%)</h2>
+   <p class="desc">Historical test set</p>
+   <div class="confusion">
+    <div class="cell">
+     <strong id="tp">—</strong><span>True Positive</span>
+    </div>
+    <div class="cell">
+     <strong id="fp">—</strong><span>False Positive</span>
+    </div>
+    <div class="cell">
+     <strong id="fn">—</strong><span>False Negative</span>
+    </div>
+    <div class="cell">
+     <strong id="tn">—</strong><span>True Negative</span>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="insight">
+  <div class="insight-icon">▥</div>
+  <div class="insight-copy">
+   <h2>Model Evaluation</h2>
+   <p id="modelInsight">
+    Historical test results, not production accuracy.
+   </p>
+  </div>
+  <button class="pink-button" data-go="decisions">
+   Explore Decisions →
+  </button>
+ </div>
+</section>
+
+<section class="screen" id="decisions">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">Business Decision Engine</div>
+   <h1>Make Better <em>Business Decisions.</em></h1>
+   <p class="subtitle">
+    Test intervention costs and expected savings before investing.
+   </p>
+  </div>
+  <div class="hero-art">
+   <div class="glow"></div>
+   <div class="symbol">🎯</div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Strategic Trade-Off Simulator</h2>
+   <p class="desc">Assumptions are hypothetical</p>
+   <div class="range-row">
+    <div class="range-label">
+     <span>Orders to Check</span>
+     <span id="capLabel">20%</span>
+    </div>
+    <input type="range" id="cap" min="5" max="50"
+           step="5" value="20">
+   </div>
+   <div class="range-row">
+    <div class="range-label">
+     <span>Cost per Intervention</span>
+     <span id="costLabel">R$ 8</span>
+    </div>
+    <input type="range" id="cost" min="1" max="50"
+           step="1" value="8">
+   </div>
+   <div class="range-row">
+    <div class="range-label">
+     <span>Assumed Success Rate</span>
+     <span id="successLabel">35%</span>
+    </div>
+    <input type="range" id="success" min="5" max="100"
+           step="5" value="35">
+   </div>
+   <div class="range-row">
+    <div class="range-label">
+     <span>Value per Avoided Delay</span>
+     <span id="valueLabel">R$ 45</span>
+    </div>
+    <input type="range" id="value" min="5" max="200"
+           step="5" value="45">
+   </div>
+  </div>
+  <div class="card">
+   <h2>Estimated Business Impact</h2>
+   <p class="desc">Scenario model — not realized savings</p>
+   <div class="impact">
+    <div class="cell"><small>Orders Flagged</small><strong id="dFlagged">—</strong></div>
+    <div class="cell"><small>Expected Delays Prevented</small><strong id="dPrevented">—</strong></div>
+    <div class="cell"><small>Intervention Cost</small><strong id="dCost">—</strong></div>
+    <div class="cell highlight"><small>Estimated Benefit</small><strong id="dBenefit">—</strong></div>
+    <div class="cell"><small>Net Value</small><strong id="dNet">—</strong></div>
+    <div class="cell"><small>ROI</small><strong id="dRoi">—</strong></div>
+   </div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Experiment Plan (A/B Test)</h2>
+   <p class="desc">
+    Proposed experiment; not yet conducted
+   </p>
+   <div class="ab-box">
+    <div><small>Group A</small><b>Control</b>
+     <small>Standard process</small>
+    </div>
+    <div><small>Group B</small><b>Treatment</b>
+     <small>Model-guided action</small>
+    </div>
+   </div>
+   <p class="desc">
+    Randomize eligible orders and measure delay rate,
+    intervention cost and customer experience.
+   </p>
+  </div>
+  <div class="card">
+   <h2>AI Business Analyst</h2>
+   <p class="desc">
+    Transparent, data-grounded answers.
+    No external LLM connected.
+   </p>
+   <div class="chat-form">
+    <input id="question"
+      placeholder="Ask a business question...">
+    <button class="pink-button" id="ask">➤</button>
+   </div>
+   <div class="chat-output" id="answer">
+    Select a question to explore the data.
+   </div>
+   <div class="chips">
+    <button class="chip" data-question="Why are orders late?">
+     Why are orders late?
+    </button>
+    <button class="chip" data-question="What if we check 30%?">
+     What if we check 30%?
+    </button>
+    <button class="chip" data-question="Is the ROI positive?">
+     Is the ROI positive?
+    </button>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="screen" id="reviews">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">Customer Experience Intelligence</div>
+   <h1>Turn Customer Feedback into<br>
+    <em>Business Insights.</em>
+   </h1>
+   <p class="subtitle">
+    Understand customer satisfaction, complaints
+    and the reasons behind negative reviews.
+   </p>
+  </div>
+  <div class="hero-art">
+   <div class="glow"></div>
+   <div class="symbol">💬</div>
+  </div>
+ </div>
+ <div class="metrics">
+  <div class="card metric primary">
+   <div class="metric-icon">▢</div>
+   <div class="kicker">Total Reviews</div>
+   <div class="value" id="rTotal">—</div>
+   <div class="note">Historical review records</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">☆</div>
+   <div class="kicker">Avg. Rating</div>
+   <div class="value" id="rAvg">—</div>
+   <div class="note">Out of 5</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">♧</div>
+   <div class="kicker">Positive Reviews</div>
+   <div class="value" id="rPositive">—</div>
+   <div class="note">4–5 stars</div>
+  </div>
+  <div class="card metric">
+   <div class="metric-icon">♧</div>
+   <div class="kicker">Negative Reviews</div>
+   <div class="value" id="rNegative">—</div>
+   <div class="note">1–2 stars</div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Sentiment Distribution</h2>
+   <p class="desc">Rating-derived sentiment groups</p>
+   <div id="sentimentChart" class="plot"></div>
+  </div>
+  <div class="card">
+   <h2>Review Rating Distribution</h2>
+   <p class="desc">Share of all reviews by star rating</p>
+   <div id="reviewRatingChart" class="plot"></div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Review Trend Over Time</h2>
+   <div id="reviewTrendChart" class="plot"></div>
+  </div>
+  <div class="card">
+   <h2>Ratings vs. Delivery Delay</h2>
+   <div id="deliveryReviewChart" class="plot"></div>
+  </div>
+ </div>
+ <div class="panel-grid equal">
+  <div class="card">
+   <h2>Review Explorer</h2>
+   <p class="desc">
+    Search actual Portuguese customer comments
+   </p>
+   <input id="reviewSearch" class="review-search"
+     placeholder="Search: atraso, produto, entrega">
+   <div id="reviewResults"></div>
+  </div>
+  <div class="insight" style="margin-top:0;align-items:flex-start">
+   <div class="insight-icon">◎</div>
+   <div class="insight-copy">
+    <h2>Key Insight</h2>
+    <p id="reviewInsight">
+     Calculating the relationship between delivery
+     delays and low customer ratings...
+    </p>
+    <p style="margin-top:15px;font-size:11px">
+     Historical association, not causal evidence.
+    </p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<div class="footer">
+ RetailAI 3.0 · Historical Olist Dataset ·
+ Analytics and model results are retrospective
+</div>
+</div>
+
+<script>
+const PINK='#f50080';
+const DARK='#29232e';
+const LIGHT='#ffb7db';
+const fmt=n=>Number(n).toLocaleString('en-US');
+const money=n=>'R$ '+Number(n).toLocaleString(
+ 'en-US',{maximumFractionDigits:0}
+);
+const pct=n=>(100*Number(n)).toFixed(2)+'%';
+const $=id=>document.getElementById(id);
+const set=(id,value)=>{
+ const el=$(id);
+ if(el)el.textContent=value;
+};
+const safe=s=>String(s??'').replace(
+ /[&<>"']/g,c=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;',
+  '"':'&quot;',"'":'&#39;'
+ })[c]
+);
+
+const plotLayout={
+ paper_bgcolor:'rgba(0,0,0,0)',
+ plot_bgcolor:'rgba(0,0,0,0)',
+ font:{family:'Arial,sans-serif',size:11,color:'#29232e'},
+ margin:{l:42,r:14,t:20,b:42},
+ xaxis:{showgrid:false,zeroline:false},
+ yaxis:{gridcolor:'#ece8ee',zeroline:false},
+ legend:{orientation:'h',y:1.18},
+ autosize:true
+};
+const plotConfig={
+ responsive:true,
+ displayModeBar:false
+};
+const draw=(id,traces,layout={})=>{
+ if(typeof Plotly==='undefined'){
+  $(id).textContent='Chart library unavailable.';
+  return;
+ }
+ Plotly.react(
+  id,traces,{...plotLayout,...layout},plotConfig
+ );
+};
+async function api(path){
+ const response=await fetch(path);
+ if(!response.ok){
+  throw Error(path+' returned HTTP '+response.status);
+ }
+ return response.json();
+}
+function error(message){
+ const el=$('status');
+ el.textContent=message;
+ el.classList.add('visible');
+}
+function clearError(){
+ $('status').classList.remove('visible');
+}
+const loaded={};
+let cache={};
+function navigate(page){
+ if(!$(page))page='overview';
+ document.querySelectorAll('.screen').forEach(el=>
+  el.classList.toggle('active',el.id===page)
+ );
+ document.querySelectorAll('.tab').forEach(el=>
+  el.classList.toggle(
+   'active',el.dataset.page===page
+  )
+ );
+ location.hash=page;
+ clearError();
+ if(!loaded[page]){
+  loadPage(page).catch(e=>error(e.message));
+ }
+}
+document.querySelectorAll('[data-page]').forEach(b=>
+ b.addEventListener('click',()=>navigate(b.dataset.page))
+);
+document.querySelectorAll('[data-go]').forEach(b=>
+ b.addEventListener('click',()=>navigate(b.dataset.go))
+);
+
+async function loadPage(page){
+ if(page==='overview')await loadOverview();
+ if(page==='customers')await loadCustomers();
+ if(page==='predictions')await loadPredictions();
+ if(page==='decisions')await loadDecisions();
+ if(page==='reviews')await loadReviews();
+ loaded[page]=true;
+}
+
+async function loadOverview(){
+ const d=await api('/api/overview');
+ cache.overview=d;
+ set('oRevenue',money(d.total_revenue));
+ set('oOrders',fmt(d.total_orders));
+ set('oAov',money(d.average_order_value));
+ set('oLate',pct(d.historical_late_rate));
+
+ const months=(d.monthly||[]).filter(x=>
+  /^\d{4}-\d{2}$/.test(x.month)
+ );
+ draw('salesChart',[{
+  type:'scatter',mode:'lines+markers',
+  name:'Revenue',
+  x:months.map(x=>x.month),
+  y:months.map(x=>x.revenue/1e6),
+  line:{color:PINK,width:3},
+  marker:{size:7,color:PINK},
+  fill:'tozeroy',
+  fillcolor:'rgba(245,0,128,.08)'
+ }],{
+  yaxis:{title:'Revenue (R$ M)',gridcolor:'#ece8ee'},
+  margin:{l:58,r:10,t:18,b:58}
+ });
+
+ const categories=d.categories||[];
+ const max=Math.max(...categories.map(x=>x.revenue),1);
+ $('categoryRows').innerHTML=categories.slice(0,7).map(x=>`
+  <div class="category-row">
+   <span>${safe(x.name)}</span>
+   <div class="bar-bg">
+    <div class="bar" style="width:${100*x.revenue/max}%"></div>
+   </div>
+   <strong>${money(x.revenue)}</strong>
+  </div>
+ `).join('');
+ set(
+  'overviewInsight',
+  `${fmt(d.total_orders)} orders analyzed. `+
+  `${pct(d.historical_late_rate)} of delivered orders `+
+  `with known dates arrived after their estimated date.`
+ );
+}
+
+async function loadCustomers(){
+ const d=await api('/api/customers');
+ cache.customers=d;
+ set('cUnique',fmt(d.unique_customers));
+ set('cRepeat',pct(d.repeat_rate));
+ set('cRating',d.average_review.toFixed(2)+' / 5');
+ set('cGroups',(d.segments||[]).length);
+
+ const seg=d.segments||[];
+ const colors=[PINK,'#ff9bcc','#c2a5b7',DARK];
+
+ draw('segmentsChart',[{
+  type:'pie',
+  hole:.67,
+  labels:seg.map(x=>x.segment),
+  values:seg.map(x=>x.customers),
+  marker:{colors},
+  textinfo:'percent',
+  hovertemplate:'%{label}: %{value:,}<extra></extra>'
+ }],{
+  showlegend:true,
+  margin:{l:12,r:12,t:15,b:12},
+  legend:{orientation:'v',x:1,y:.9}
+ });
+
+ const total=seg.reduce((a,x)=>a+x.customers,0);
+ $('segmentRows').innerHTML=seg.map((x,i)=>`
+  <div class="segment-row">
+   <span>
+    <i class="dot" style="background:${colors[i%4]}"></i>
+    ${safe(x.segment)}
+   </span>
+   <strong>${fmt(x.customers)}
+    (${(100*x.customers/total).toFixed(1)}%)
+   </strong>
+  </div>
+ `).join('');
+
+ const ratings=d.review_scores||[];
+ draw('customerRatings',[{
+  type:'bar',
+  orientation:'h',
+  x:ratings.map(x=>x.count),
+  y:ratings.map(x=>x.score+' ★'),
+  marker:{color:ratings.map((x,i)=>
+   ['#c6a9bc','#edc2d9','#f7a8d0','#fa72b4',PINK][i]
+  )}
+ }],{
+  margin:{l:50,r:20,t:10,b:40},
+  showlegend:false
+ });
+
+ $('retentionInfo').innerHTML=`
+  <div style="padding:20px 0">
+   <div style="font-size:43px;font-weight:850;color:${PINK}">
+    ${pct(d.repeat_rate)}
+   </div>
+   <p class="desc">
+    Share of customers with more than one observed order.
+   </p>
+   <p class="desc">
+    Cohort retention heatmap requires a separate
+    verified cohort-series API.
+    This panel does not invent monthly retention values.
+   </p>
+  </div>
+ `;
+}
+
+async function loadPredictions(){
+ const d=await api('/api/predictions');
+ cache.predictions=d;
+ const c=d.confusion;
+ const flagged=c.tp+c.fp;
+
+ set('pRecall',pct(d.recall_at_20));
+ set('pEvaluated',fmt(d.evaluated_orders));
+ set('pLate',fmt(d.late_orders));
+ set('pFlagged',fmt(flagged));
+ set('pR2',pct(d.recall_at_20));
+ set('pPrecision',pct(d.precision_at_20));
+ set('pLift',Number(d.lift_at_20).toFixed(2)+'×');
+ set('pAuc',Number(d.roc_auc).toFixed(4));
+
+ ['tp','fp','fn','tn'].forEach(k=>set(k,fmt(c[k])));
+
+ const capacity=(d.capacity||[]).filter(x=>
+  Number.isFinite(Number(x.capacity))
+ ).sort((a,b)=>a.capacity-b.capacity);
+
+ draw('capacityChart',[{
+  type:'scatter',
+  mode:'lines+markers',
+  x:capacity.map(x=>x.capacity*100),
+  y:capacity.map(x=>x.recall*100),
+  line:{color:PINK,width:3},
+  marker:{color:PINK,size:8},
+  fill:'tozeroy',
+  fillcolor:'rgba(245,0,128,.10)',
+  name:'Recall'
+ }],{
+  xaxis:{title:'Review capacity (%)',showgrid:false},
+  yaxis:{title:'Recall (%)',range:[0,100],gridcolor:'#ece8ee'}
+ });
+
+ set('modelInsight',
+  `${d.champion}: ROC-AUC ${Number(d.roc_auc).toFixed(3)}, `+
+  `PR-AUC ${Number(d.pr_auc).toFixed(3)}. `+
+  `Platt calibration was evaluated separately.`
+ );
+}
+
+async function loadDecisions(){
+ await updateDecision();
+}
+let decisionTimer;
+function scheduleDecision(){
+ clearTimeout(decisionTimer);
+ decisionTimer=setTimeout(
+  ()=>updateDecision().catch(e=>error(e.message)),180
+ );
+}
+['cap','cost','success','value'].forEach(id=>{
+ $(id).addEventListener('input',()=>{
+  set('capLabel',$('cap').value+'%');
+  set('costLabel','R$ '+$('cost').value);
+  set('successLabel',$('success').value+'%');
+  set('valueLabel','R$ '+$('value').value);
+  scheduleDecision();
+ });
+});
+async function updateDecision(){
+ const params=new URLSearchParams({
+  capacity:($('cap').value/100).toString(),
+  cost:$('cost').value,
+  success:($('success').value/100).toString(),
+  value:$('value').value
+ });
+ const d=await api('/api/decisions?'+params);
+ cache.decisions=d;
+ set('dFlagged',fmt(d.flagged));
+ set('dPrevented',Number(d.expected_prevented).toFixed(0));
+ set('dCost',money(d.intervention_cost));
+ set('dBenefit',money(d.gross_benefit));
+ set('dNet',money(d.net_benefit));
+ set('dRoi',d.roi===null?'—':pct(d.roi));
+}
+function answerQuestion(){
+ const q=$('question').value.toLowerCase();
+ const d=cache.decisions;
+ const p=cache.predictions;
+ const o=cache.overview;
+ let answer='This question is not supported by the verified dashboard data.';
+
+ if(q.includes('30%')){
+  $('cap').value=30;
+  set('capLabel','30%');
+  updateDecision().catch(e=>error(e.message));
+  answer='Review capacity set to 30%. The simulator will recalculate using historical test results.';
+ }else if(q.includes('roi')||q.includes('profit')){
+  answer=d?
+   `Estimated scenario ROI is ${pct(d.roi)}. `+
+   `This is hypothetical, not measured business impact.`:
+   'Load the simulator first.';
+ }else if(q.includes('late')||q.includes('delay')){
+  answer=o?
+   `${pct(o.historical_late_rate)} of delivered orders `+
+   `with known dates were late. This dashboard does `+
+   `not establish the causal reasons for lateness.`:
+   'Open Overview to load the late-delivery metric.';
+ }else if(q.includes('model')||q.includes('recall')){
+  answer=p?
+   `The model identifies ${pct(p.recall_at_20)} of `+
+   `late orders when reviewing the top-risk 20%.`:
+   'Open AI Predictions to load the model audit.';
+ }
+ set('answer',answer);
+}
+$('ask').addEventListener('click',answerQuestion);
+$('question').addEventListener('keydown',e=>{
+ if(e.key==='Enter')answerQuestion();
+});
+document.querySelectorAll('[data-question]').forEach(b=>
+ b.addEventListener('click',()=>{
+  $('question').value=b.dataset.question;
+  answerQuestion();
+ })
+);
+
+
+/* REVIEWS V2 — NO EXTERNAL CHART LIBRARY REQUIRED */
+
+let reviewsLoaded = false;
+
+function svgEl(tag, attributes={}, text=null){
+    const ns="http://www.w3.org/2000/svg";
+    const el=document.createElementNS(ns,tag);
+    for(const [key,value] of Object.entries(attributes)){
+        el.setAttribute(key,String(value));
+    }
+    if(text!==null)el.textContent=String(text);
+    return el;
+}
+
+function makeSvg(container,w=640,h=250){
+    const host=document.getElementById(container);
+    host.innerHTML="";
+    const svg=svgEl("svg",{
+        viewBox:`0 0 ${w} ${h}`,
+        preserveAspectRatio:"xMidYMid meet",
+        role:"img"
+    });
+    host.appendChild(svg);
+    return svg;
+}
+
+function svgText(svg,x,y,text,size=12,color="#332b36",extra={}){
+    svg.appendChild(svgEl("text",{
+        x,y,fill:color,
+        "font-size":size,
+        "font-family":"Arial, sans-serif",
+        ...extra
+    },text));
+}
+
+function svgLine(svg,x1,y1,x2,y2,color="#eee",width=1){
+    svg.appendChild(svgEl("line",{
+        x1,y1,x2,y2,
+        stroke:color,
+        "stroke-width":width
+    }));
+}
+
+function svgRect(svg,x,y,w,h,color,rx=0){
+    svg.appendChild(svgEl("rect",{
+        x,y,width:Math.max(0,w),
+        height:Math.max(0,h),
+        rx,fill:color
+    }));
+}
+
+function renderSentiment(data){
+    const host=document.getElementById("sentimentChart");
+    host.innerHTML="";
+
+    const wrapper=document.createElement("div");
+    wrapper.className="review-donut-layout";
+
+    const chart=document.createElement("div");
+    chart.style.height="235px";
+    wrapper.appendChild(chart);
+
+    const legend=document.createElement("div");
+    wrapper.appendChild(legend);
+    host.appendChild(wrapper);
+
+    const svg=svgEl("svg",{
+        viewBox:"0 0 260 235",
+        role:"img",
+        "aria-label":"Review sentiment donut chart"
+    });
+    chart.appendChild(svg);
+
+    const cx=128,cy=115,r=77;
+    const circumference=2*Math.PI*r;
+
+    const colors={
+        Positive:"#f50080",
+        Neutral:"#ffb7db",
+        Negative:"#29232e"
+    };
+
+    svg.appendChild(svgEl("circle",{
+        cx,cy,r,
+        fill:"none",
+        stroke:"#f1edf2",
+        "stroke-width":32
+    }));
+
+    let offset=0;
+    for(const item of data.sentiment){
+        const fraction=item.count/data.total_reviews;
+        svg.appendChild(svgEl("circle",{
+            cx,cy,r,
+            fill:"none",
+            stroke:colors[item.label],
+            "stroke-width":32,
+            "stroke-dasharray":
+                `${fraction*circumference} ${circumference}`,
+            "stroke-dashoffset":-offset*circumference,
+            transform:`rotate(-90 ${cx} ${cy})`
+        }));
+        offset+=fraction;
+    }
+
+    svgText(svg,cx,111,
+        Number(data.total_reviews).toLocaleString(),
+        23,"#17151b",{
+            "font-weight":"800",
+            "text-anchor":"middle"
+        }
+    );
+    svgText(svg,cx,131,"Reviews",12,"#777",{
+        "text-anchor":"middle"
+    });
+
+    for(const item of data.sentiment){
+        const row=document.createElement("div");
+        row.className="review-legend-row";
+
+        const label=document.createElement("span");
+        const dot=document.createElement("i");
+        dot.style.background=colors[item.label];
+        label.appendChild(dot);
+        label.appendChild(
+            document.createTextNode(item.label)
+        );
+
+        const value=document.createElement("strong");
+        value.textContent=item.pct.toFixed(1)+"%";
+
+        row.append(label,value);
+        legend.appendChild(row);
+    }
+}
+
+function renderRatings(data){
+    const svg=makeSvg("reviewRatingChart",620,250);
+
+    const ratings=data.rating_distribution||[];
+    const max=Math.max(...ratings.map(x=>x.count),1);
+    const left=70,right=45,top=18,bottom=45;
+    const width=620-left-right;
+    const height=250-top-bottom;
+
+    for(let i=0;i<=4;i++){
+        const y=top+i*height/4;
+        svgLine(svg,left,y,620-right,y,"#eee8ef");
+        svgText(svg,12,y+4,
+            Math.round((1-i/4)*max).toLocaleString(),
+            11,"#777"
+        );
+    }
+
+    const slot=width/5;
+    ratings.forEach((item,i)=>{
+        const barWidth=slot*.55;
+        const barHeight=item.count/max*height;
+        const x=left+i*slot+(slot-barWidth)/2;
+        const y=top+height-barHeight;
+
+        svgRect(svg,x,y,barWidth,barHeight,
+            ["#bba7b7","#e9a3c8","#f59bc9",
+             "#ff5eae","#f50080"][i],6);
+
+        svgText(svg,x+barWidth/2,y-7,
+            (item.count/data.total_reviews*100).toFixed(1)+"%",
+            11,"#29232e",{
+                "text-anchor":"middle",
+                "font-weight":"700"
+            });
+
+        svgText(svg,x+barWidth/2,239,
+            item.score+" ★",12,"#29232e",{
+                "text-anchor":"middle"
+            });
+    });
+}
+
+function renderTrend(data){
+    const svg=makeSvg("reviewTrendChart",640,250);
+    const series=Array.isArray(data.trend)?data.trend:[];
+
+    if(!series.length){
+        svgText(svg,320,125,"No monthly data available",
+            14,"#777",{"text-anchor":"middle"});
+        return;
+    }
+
+    const left=55,right=22,top=20,bottom=47;
+    const width=640-left-right;
+    const height=250-top-bottom;
+
+    for(let i=0;i<=4;i++){
+        const y=top+i*height/4;
+        svgLine(svg,left,y,640-right,y,"#eee8ef");
+        svgText(svg,12,y+4,(100-i*25)+"%",11,"#777");
+    }
+
+    const x=i=>left+i*width/Math.max(series.length-1,1);
+    const y=v=>top+height-(v/100)*height;
+
+    function drawSeries(key,color){
+        const points=series.map((d,i)=>[
+            x(i),y(Number(d[key]||0))
+        ]);
+
+        const path=points.map((p,i)=>
+            `${i?"L":"M"}${p[0]},${p[1]}`
+        ).join(" ");
+
+        svg.appendChild(svgEl("path",{
+            d:path,
+            fill:"none",
+            stroke:color,
+            "stroke-width":3,
+            "stroke-linejoin":"round"
+        }));
+
+        points.forEach((p,i)=>{
+            if(i%Math.max(1,Math.ceil(points.length/9))===0){
+                svg.appendChild(svgEl("circle",{
+                    cx:p[0],cy:p[1],r:3.5,
+                    fill:"#fff",stroke:color,
+                    "stroke-width":2
+                }));
+            }
+        });
+    }
+
+    drawSeries("positive","#f50080");
+    drawSeries("negative","#29232e");
+
+    const step=Math.max(1,Math.ceil(series.length/7));
+    series.forEach((d,i)=>{
+        if(i%step===0){
+            svgText(svg,x(i),238,d.month,10,"#777",{
+                "text-anchor":"middle"
+            });
+        }
+    });
+
+    svgRect(svg,380,5,12,5,"#f50080",2);
+    svgText(svg,397,12,"Positive",11);
+
+    svgRect(svg,495,5,12,5,"#29232e",2);
+    svgText(svg,512,12,"Negative",11);
+}
+
+function renderDeliveryRatings(data){
+    const svg=makeSvg("deliveryReviewChart",640,250);
+
+    const groups=data.delivery_ratings||[];
+    const max=Math.max(
+        10,
+        ...groups.flatMap(x=>x.values||[])
+    );
+    const scaleMax=Math.ceil(max/10)*10;
+
+    const left=55,right=25,top=30,bottom=43;
+    const width=640-left-right;
+    const height=250-top-bottom;
+
+    for(let i=0;i<=4;i++){
+        const y=top+i*height/4;
+        svgLine(svg,left,y,640-right,y,"#eee8ef");
+        svgText(svg,10,y+4,
+            (scaleMax*(1-i/4)).toFixed(0)+"%",
+            11,"#777"
+        );
+    }
+
+    const slot=width/5;
+    for(let i=0;i<5;i++){
+        groups.forEach((g,j)=>{
+            const value=Number(g.values[i]||0);
+            const bw=slot*.27;
+            const bh=value/scaleMax*height;
+            const x=left+i*slot+slot*.2+j*bw;
+            const y=top+height-bh;
+            svgRect(svg,x,y,bw,bh,
+                j===0?"#ffb7db":"#f50080",4);
+        });
+
+        svgText(svg,
+            left+i*slot+slot/2,239,
+            (i+1)+" ★",12,"#29232e",{
+                "text-anchor":"middle"
+            }
+        );
+    }
+
+    svgRect(svg,360,5,12,9,"#ffb7db",2);
+    svgText(svg,377,14,"On-time",11);
+
+    svgRect(svg,475,5,12,9,"#f50080",2);
+    svgText(svg,492,14,"Late",11);
+}
+
+function renderReviewExplorer(data){
+    const host=document.getElementById("reviewResults");
+    host.innerHTML="";
+
+    if(!data.review_explorer.length){
+        const empty=document.createElement("p");
+        empty.className="desc";
+        empty.textContent="No matching reviews found.";
+        host.appendChild(empty);
+        return;
+    }
+
+    for(const item of data.review_explorer){
+        const row=document.createElement("div");
+        row.className="review-row";
+
+        const stars=document.createElement("span");
+        stars.className="stars";
+        stars.textContent="★".repeat(item.rating)
+            +"☆".repeat(5-item.rating);
+
+        const comment=document.createElement("span");
+        comment.textContent=item.text;
+
+        const sentiment=document.createElement("span");
+        sentiment.className="sent";
+        sentiment.textContent=item.sentiment;
+
+        row.append(stars,comment,sentiment);
+        host.appendChild(row);
+    }
+}
+
+
+async function loadReviews(search=""){
+    const data=await api(
+        "/api/reviews-v2?search="+encodeURIComponent(search)
+    );
+
+    cache.reviews=data;
+
+    const sentiments=Array.isArray(data.sentiment)
+        ?data.sentiment:[];
+    const ratings=Array.isArray(data.rating_distribution)
+        ?data.rating_distribution:[];
+    const trend=Array.isArray(data.trend)
+        ?data.trend:[];
+    const delivery=Array.isArray(data.delivery_ratings)
+        ?data.delivery_ratings:[];
+    const explorer=Array.isArray(data.review_explorer)
+        ?data.review_explorer:[];
+
+    const total=Number(data.total_reviews||0);
+    const avg=Number(data.average_rating||0);
+
+    set("rTotal",fmt(total));
+    set("rAvg",avg.toFixed(2)+" / 5");
+
+    const positive=sentiments.find(
+        x=>x.label==="Positive"
+    );
+    const negative=sentiments.find(
+        x=>x.label==="Negative"
+    );
+
+    set("rPositive",
+        Number(positive?.pct||0).toFixed(1)+"%");
+    set("rNegative",
+        Number(negative?.pct||0).toFixed(1)+"%");
+
+    const chartData={
+        ...data,
+        total_reviews:total,
+        sentiment:sentiments,
+        rating_distribution:ratings,
+        trend:trend,
+        delivery_ratings:delivery,
+        review_explorer:explorer
+    };
+
+    const renderers=[
+        ["sentimentChart",renderSentiment],
+        ["reviewRatingChart",renderRatings],
+        ["reviewTrendChart",renderTrend],
+        ["deliveryReviewChart",renderDeliveryRatings]
+    ];
+
+    for(const [id,render] of renderers){
+        try{
+            render(chartData);
+        }catch(err){
+            console.error("Chart failed:",id,err);
+            const el=document.getElementById(id);
+            if(el){
+                el.textContent=
+                    "Chart unavailable: "+err.message;
+            }
+        }
+    }
+
+    const ratio=Number(data.late_low_rating_ratio);
+
+    set("reviewInsight",
+        data.late_low_rating_ratio==null
+        || !Number.isFinite(ratio)
+        ? "Insufficient observations to estimate the relationship."
+        : "Historically, late deliveries were "+
+          ratio.toFixed(2)+"× as likely to receive "+
+          "a 1–2-star rating compared with "+
+          "on-time deliveries."
+    );
+
+    try{
+        renderReviewExplorer(chartData);
+    }catch(err){
+        console.error("Explorer failed:",err);
+        document.getElementById("reviewResults")
+            .textContent="Review explorer error: "+err.message;
+    }
+
+    reviewsLoaded=true;
+}
+
+let searchTimer;
+$('reviewSearch').addEventListener('input',e=>{
+ clearTimeout(searchTimer);
+ searchTimer=setTimeout(
+  ()=>loadReviews(e.target.value)
+   .catch(err=>error(err.message)),300
+ );
+});
+
+navigate(location.hash.slice(1)||'overview');
+</script>
+</body>
+</html>

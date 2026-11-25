@@ -1,0 +1,104 @@
+
+# ==========================================
+# RetailAI — Generated / Private Files
+# ==========================================
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+conda-env/
+site-packages/
+
+# macOS / Editors
+.DS_Store
+.idea/
+.vscode/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*credentials*.json
+*service-account*.json
+
+# Original and processed datasets
+datasets/raw/
+datasets/processed/
+data/raw/
+data/processed/
+*.parquet
+
+# Large model artifacts
+*.joblib
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.safetensors
+*.onnx
+*.ckpt
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Project backups and temporary files
+backups/
+upgrade_backup/
+dashboard_interview/upgrade_backup/
+dashboard_interview/backups/
+dashboard_interview/premium/index_backup_*
+*.bak
+*.log
+*.tmp
+
+# Analysis and generated outputs
+reports/reviews_verified/
+dashboard_interview/reports/reviews_verified/
+
+# Local server files
+nohup.out
+
+
+# RetailAI exclusions
+datasets/
+models/
+node_modules/
+.venv/
+venv/
+env/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+backups/
+*backup*
+*.parquet
+*.joblib
+*.pkl
+*.zip
+*.log
+*.bak
+*.pt
+*.pth
+*.safetensors
+.env
+.env.*
+*.pem
+*.key
+*credentials*.json

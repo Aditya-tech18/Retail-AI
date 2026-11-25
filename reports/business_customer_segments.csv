@@ -1,0 +1,4 @@
+customer_segment,customers,orders,recorded_volume_brl,avg_customer_spend_brl,median_customer_spend_brl,repeat_customers,revenue_share_pct,repeat_rate_pct
+One-Time / Low-Engagement Customers,90557,90639,14569407.77,160.88659926896872,105.56,81,92.56802174568529,0.08944642600792871
+Repeat High-Value Customers,2801,5930,865453.5,308.98018564798286,226.05,2801,5.4987354100172485,100.0
+Unsegmented,1632,1638,304275.74,186.44346813725488,114.94,6,1.9332428442974714,0.36764705882352944
